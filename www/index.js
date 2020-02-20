@@ -19,46 +19,11 @@ const renderLoop = () => {
     requestAnimationFrame(renderLoop);
 };
 
-const getIndex = (row, column) => {
-    return row * width + column;
-};
-
-const rgbToHex = (rgb) => {
-    var hex = Number(rgb).toString(16);
-    if (hex.length < 2) {
-        hex = "0" + hex;
-    }
-    return hex;
-}
-
-const getRGB = (value) => {
-    const r = ((value & 0x03) >> 0) * (256 / 4);
-    const g = ((value & 0x0C) >> 2) * (256 / 4);
-    const b = ((value & 0x30) >> 4) * (256 / 4);
-    return "#" + rgbToHex(r) + rgbToHex(g) + rgbToHex(b);
-};
-
 const drawPlot = () => {
-    const plotPtr = mandelbrot.plot_data();
-    const plot = new Uint8Array(memory.buffer, plotPtr, width * height);
-
-    // var myImageData = ctx.createImageData(width, height);
-    // Uint8ClampedArray.from(plot);
-
-    for (let row = 0; row < height; row++) {
-        for (let col = 0; col < width; col++) {
-            const idx = getIndex(row, col);
-            var rgb;
-            if (plot[idx] >= mandelbrot.max_iterations()) {
-                rgb = "#000000";
-            } else {
-                rgb = getRGB(plot[idx]);
-            }
-            ctx.fillStyle = rgb;
-
-            ctx.fillRect(col, row, 1, 1);
-        }
-    }
+    const plotRgbaPtr = mandelbrot.plot_rgba();
+    const plotRgba = new Uint8ClampedArray(memory.buffer, plotRgbaPtr, width * height * 4); // 4 bytes per RGBA
+    const imageData = new ImageData(plotRgba, width);
+    ctx.putImageData(imageData, 0, 0);
 };
 
 const fps = new class {

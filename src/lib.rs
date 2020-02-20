@@ -9,6 +9,15 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+#[repr(C, packed)]
+#[derive(Clone)]
+struct RGBA {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+}
+
 #[wasm_bindgen]
 pub struct Mandelbrot {
     view_left: f32, // Left side of the view in complex space
@@ -18,7 +27,8 @@ pub struct Mandelbrot {
     max_iterations: u8,
     plot_width: u32,
     plot_height: u32,
-    plot: Vec<u8>, // The plot data. Must be sized at least (width * height) elements.
+    plot: Vec<u8>, // The number of iterations before the value escaped (or max_iterations if it never escaped). Must be sized at least (width * height) bytes.
+    plot_rgba: Vec<RGBA>, // The plot data converted to RGBA. Must be sized at least (width * height * 4) bytes.
 }
 
 /// Private methods, not visible to JavaScript
@@ -49,6 +59,20 @@ impl Mandelbrot {
 
         None
     }
+
+    fn rgba(&self, value: u8) -> RGBA {
+        let r = ((value & 0x03) >> 0) * 64;
+        let g = ((value & 0x0C) >> 2) * 64;
+        let b = ((value & 0x30) >> 4) * 64;
+        let a = 255;
+
+        RGBA {
+            r: r,
+            g: g,
+            b: b,
+            a: a,
+        }
+    }
 }
 
 /// Public methods, exported to JavaScript.
@@ -56,8 +80,6 @@ impl Mandelbrot {
 impl Mandelbrot {
     pub fn new(plot_width: u32, plot_height: u32) -> Self {
         utils::set_panic_hook();
-
-        let plot = vec![0; (plot_width * plot_height) as usize];
 
         Self {
             view_left: -2.5,
@@ -67,7 +89,8 @@ impl Mandelbrot {
             max_iterations: 6,
             plot_width: plot_width,
             plot_height: plot_height,
-            plot: plot,
+            plot: vec![0; (plot_width * plot_height) as usize],
+            plot_rgba: vec![RGBA { r: 0, g: 0, b: 0, a: 0 }; (plot_width * plot_height) as usize],
         }
     }
 
@@ -91,11 +114,16 @@ impl Mandelbrot {
                 let iterations = self.iterate(x, y);
                 let idx = self.get_index(x, y);
                 self.plot[idx] = iterations.unwrap_or(self.max_iterations);
+                self.plot_rgba[idx] = self.rgba(self.plot[idx]);
             }
         }
     }
 
     pub fn plot_data(&self) -> *const u8 {
         self.plot.as_ptr()
+    }
+
+    pub fn plot_rgba(&self) -> *const u8 {
+        self.plot_rgba.as_ptr() as *const u8
     }
 }
