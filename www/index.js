@@ -5,6 +5,7 @@ import { memory } from "mandelbrot_wasm/mandelbrot_wasm_bg"; // Import the WebAs
 const width = 500;
 const height = 500;
 const mandelbrot = Mandelbrot.new(width, height);
+var plotDirty = true;
 
 // Give the canvas room for our plot
 const canvas = document.getElementById("mandelbrot-canvas");
@@ -15,7 +16,12 @@ const ctx = canvas.getContext('2d');
 
 const renderLoop = () => {
     fps.render();
-    //drawPlot();
+    if (plotDirty == true) {
+        plotDirty = false;
+        mandelbrot.plot_generate();
+        drawPlot();
+    }
+
     requestAnimationFrame(renderLoop);
 };
 
@@ -69,6 +75,19 @@ max of last 100 = ${Math.round(max)}
     }
 };
 
-mandelbrot.plot_generate();
-drawPlot();
+var maxIterationsSlider = document.getElementById("max-iterations-slider");
+var maxIterationsValue = document.getElementById("max-iterations-value");
+maxIterationsValue.innerHTML = maxIterationsSlider.value; // Display the default slider value
+
+// Update the current slider value (each time you drag the slider handle)
+maxIterationsSlider.addEventListener("input", event => {
+    maxIterationsValue.innerHTML = event.target.value;
+    mandelbrot.max_iterations_set(event.target.value);
+    plotDirty = true;
+});
+
+// Idea: add click controls for panning and zooming. Could do click to center and a button to zoom in/out. Click and drag to pan and mouse wheel to zoom.
+// Idea: add a button to force re-generating the plot. Add a checkbox to disable/enable re-generating the plot automatically with each input.
+// Idea: add a toggle button to choose the color scheme.
+
 requestAnimationFrame(renderLoop);

@@ -90,7 +90,7 @@ impl Mandelbrot {
             view_top: -2.0,
             view_width: 4.0,
             view_height: 4.0,
-            max_iterations: 32,
+            max_iterations: 16,
             plot_width: plot_width,
             plot_height: plot_height,
             plot: vec![0; (plot_width * plot_height) as usize],
@@ -98,8 +98,8 @@ impl Mandelbrot {
         }
     }
 
-    pub fn max_iterations(&self) -> u8 {
-        self.max_iterations
+    pub fn max_iterations_set(&mut self, max_iterations: u8) {
+        self.max_iterations = max_iterations;
     }
 
     pub fn plot_width(&self) -> u32 {

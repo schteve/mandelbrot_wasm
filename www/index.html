@@ -2,8 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello wasm-pack!</title>
+    <title>Mandelbrot Set Explorer</title>
     <style>
+      #max-iterations-value {
+        font-weight: bold;
+      }
       #fps {
         white-space: pre;
         font-family: monospace;
@@ -12,6 +15,11 @@
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+    <div class="slide-container">
+      <input type="range" min="1" max="128" value="16" class="slider" id="max-iterations-slider">
+      <span>Max iterations:</span>
+      <span id="max-iterations-value"></span>
+    </div>
     <canvas id="mandelbrot-canvas"></canvas>
     <div id="fps"></div>
     <script src="./bootstrap.js"></script>
