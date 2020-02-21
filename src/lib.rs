@@ -42,8 +42,8 @@ impl Mandelbrot {
         let cx = self.view_left + (x as f32) / ((self.plot_width - 1) as f32) * self.view_width;
         let cy = self.view_top + (y as f32) / ((self.plot_height - 1) as f32) * self.view_height;
 
-        let mut zx = cx;
-        let mut zy = cy;
+        let mut zx = 0.0;
+        let mut zy = 0.0;
         
         for i in 0..self.max_iterations {
             let xi = zx * zx - zy * zy + cx;
@@ -61,16 +61,20 @@ impl Mandelbrot {
     }
 
     fn rgba(&self, value: u8) -> RGBA {
-        let r = ((value & 0x03) >> 0) * 64;
-        let g = ((value & 0x0C) >> 2) * 64;
-        let b = ((value & 0x30) >> 4) * 64;
-        let a = 255;
-
-        RGBA {
-            r: r,
-            g: g,
-            b: b,
-            a: a,
+        if value >= self.max_iterations {
+            RGBA {
+                r: 0,
+                g: 0,
+                b: 0,
+                a: 255,
+            }
+        } else {
+            RGBA {
+                r: ((value & 0x03) >> 0) * 64,
+                g: ((value & 0x0C) >> 2) * 64,
+                b: ((value & 0x30) >> 4) * 64,
+                a: 255,
+            }
         }
     }
 }
@@ -82,11 +86,11 @@ impl Mandelbrot {
         utils::set_panic_hook();
 
         Self {
-            view_left: -2.5,
+            view_left: -2.0,
             view_top: -2.0,
             view_width: 4.0,
             view_height: 4.0,
-            max_iterations: 6,
+            max_iterations: 32,
             plot_width: plot_width,
             plot_height: plot_height,
             plot: vec![0; (plot_width * plot_height) as usize],
