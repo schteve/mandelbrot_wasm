@@ -32,6 +32,27 @@ const drawPlot = () => {
     ctx.putImageData(imageData, 0, 0);
 };
 
+canvas.addEventListener("click", event => {
+    const boundingRect = canvas.getBoundingClientRect();
+
+    const scaleX = canvas.width / boundingRect.width;
+    const scaleY = canvas.height / boundingRect.height;
+
+    const canvasX = (event.clientX - boundingRect.left) * scaleX;
+    const canvasY = (event.clientY - boundingRect.top) * scaleY;
+
+    mandelbrot.view_center(canvasX, canvasY);
+    plotDirty = true;
+});
+
+canvas.addEventListener("wheel", event => {
+    const zoomFactor = 1.0 + event.deltaY / 1000;
+    mandelbrot.view_zoom(zoomFactor);
+    plotDirty = true;
+
+    return false; // Don't propagate the event, this avoids the page scrolling
+});
+
 const fps = new class {
     constructor() {
         this.fps = document.getElementById("fps");
@@ -86,8 +107,9 @@ maxIterationsSlider.addEventListener("input", event => {
     plotDirty = true;
 });
 
-// Idea: add click controls for panning and zooming. Could do click to center and a button to zoom in/out. Click and drag to pan and mouse wheel to zoom.
-// Idea: add a button to force re-generating the plot. Add a checkbox to disable/enable re-generating the plot automatically with each input.
 // Idea: add a toggle button to choose the color scheme.
+// Idea: refactor the rust code to be based on the view center instead of left / top.
+// Idea: set max iterations from js on load and don't rely on html default value matching rust's.
+// Idea: use f64 instead of f32 to get more resolution! Need to increase max_iterations though.
 
 requestAnimationFrame(renderLoop);

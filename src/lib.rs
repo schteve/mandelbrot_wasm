@@ -98,6 +98,21 @@ impl Mandelbrot {
         }
     }
 
+    pub fn view_center(&mut self, x: f32, y: f32) {
+        // x is in the range 0..plot_width
+        // y is in the range 0..plot_height
+        self.view_left += ((x / self.plot_width as f32) - 0.5) * self.view_width;
+        self.view_top += ((y / self.plot_height as f32) - 0.5) * self.view_height;
+    }
+
+    pub fn view_zoom(&mut self, factor: f32) {
+        // Value greater than one means to zoom out, less than one means to zoom in
+        self.view_left += (self.view_width / 2.0) * (1.0 - factor);
+        self.view_top += (self.view_height / 2.0) * (1.0 - factor);
+        self.view_width *= factor;
+        self.view_height *= factor;
+    }
+
     pub fn max_iterations_set(&mut self, max_iterations: u8) {
         self.max_iterations = max_iterations;
     }
