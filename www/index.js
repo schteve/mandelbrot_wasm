@@ -111,5 +111,6 @@ maxIterationsSlider.addEventListener("input", event => {
 // Idea: refactor the rust code to be based on the view center instead of left / top.
 // Idea: set max iterations from js on load and don't rely on html default value matching rust's.
 // Idea: use f64 instead of f32 to get more resolution! Need to increase max_iterations though.
+// Idea: pull dirty flag into rust since it knows best when something changes.
 
 requestAnimationFrame(renderLoop);

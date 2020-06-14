@@ -20,10 +20,10 @@ struct RGBA {
 
 #[wasm_bindgen]
 pub struct Mandelbrot {
-    view_left: f32, // Left side of the view in complex space
-    view_top: f32, // Top side of the view in complex space
-    view_width: f32, // Width of the view in complex space (left + width = right)
-    view_height: f32, // Height of the view in complex space (top + height = bottom)
+    view_left: f64, // Left side of the view in complex space
+    view_top: f64, // Top side of the view in complex space
+    view_width: f64, // Width of the view in complex space (left + width = right)
+    view_height: f64, // Height of the view in complex space (top + height = bottom)
     max_iterations: u8,
     plot_width: u32,
     plot_height: u32,
@@ -39,8 +39,8 @@ impl Mandelbrot {
     }
 
     fn iterate(&self, x: u32, y: u32) -> Option<u8> {
-        let cx = self.view_left + (x as f32) / ((self.plot_width - 1) as f32) * self.view_width;
-        let cy = self.view_top + (y as f32) / ((self.plot_height - 1) as f32) * self.view_height;
+        let cx = self.view_left + (x as f64) / ((self.plot_width - 1) as f64) * self.view_width;
+        let cy = self.view_top + (y as f64) / ((self.plot_height - 1) as f64) * self.view_height;
 
         let mut zx = 0.0;
         let mut zy = 0.0;
@@ -98,14 +98,14 @@ impl Mandelbrot {
         }
     }
 
-    pub fn view_center(&mut self, x: f32, y: f32) {
+    pub fn view_center(&mut self, x: f64, y: f64) {
         // x is in the range 0..plot_width
         // y is in the range 0..plot_height
-        self.view_left += ((x / self.plot_width as f32) - 0.5) * self.view_width;
-        self.view_top += ((y / self.plot_height as f32) - 0.5) * self.view_height;
+        self.view_left += ((x / self.plot_width as f64) - 0.5) * self.view_width;
+        self.view_top += ((y / self.plot_height as f64) - 0.5) * self.view_height;
     }
 
-    pub fn view_zoom(&mut self, factor: f32) {
+    pub fn view_zoom(&mut self, factor: f64) {
         // Value greater than one means to zoom out, less than one means to zoom in
         self.view_left += (self.view_width / 2.0) * (1.0 - factor);
         self.view_top += (self.view_height / 2.0) * (1.0 - factor);
